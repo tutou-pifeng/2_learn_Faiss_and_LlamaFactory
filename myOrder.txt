@@ -1,0 +1,855 @@
+1、验证库
+python -c "import torch; print(torch.__version__)"
+python -c "import torch;print(torch.cuda.is_available())"
+
+
+
+2、单卡启动
+CUDA_VISIBLE_DEVICES=0 python src/webui.py
+
+3、多卡启动
+CUDA_VISIBLE_DEVICES=0,1 python src/webui.py
+
+4、查看内存资源
+source ~/.bashrc
+
+5、模型文件由系统盘转存到数据盘
+mkdir -p /root/autodl-tmp/muyan
+mv LLaMA-Factory /root/autodl-tmp/Lee_LLamaFactory/
+
+6、启动微调
+export USE_MODELSCOPE_HUB=1
+export CUDA_VISIBLE_DEVICES=0,1
+nohup llamafactory-cli webui >20240929_Lee.log 2>&1 & 
+
+llamafactory-cli train \
+    --stage sft \
+    --do_train True \
+    --model_name_or_path /root/autodl-tmp/Test_Lee/LLaMA-Factory-main/qwen2-1.5b-instruct \
+    --preprocessing_num_workers 16 \
+    --finetuning_type lora \
+    --template qwen \
+    --flash_attn auto \
+    --dataset_dir data \
+    --dataset identity \
+    --cutoff_len 1024 \
+    --learning_rate 2e-05 \
+    --num_train_epochs 9.0 \
+    --max_samples 100000 \
+    --per_device_train_batch_size 2 \
+    --gradient_accumulation_steps 8 \
+    --lr_scheduler_type cosine \
+    --max_grad_norm 1.0 \
+    --logging_steps 5 \
+    --save_steps 100 \
+    --warmup_steps 0 \
+    --optim adamw_torch \
+    --packing False \
+    --report_to none \
+    --output_dir saves/Qwen2-1.5B-Instruct/lora/train_2024-09-29-19-27-38 \
+    --plot_loss True \
+    --ddp_timeout 180000000 \
+    --include_num_input_tokens_seen True \
+    --lora_rank 8 \
+    --lora_alpha 16 \
+    --lora_dropout 0 \
+    --lora_target all
+
+(base) root@autodl-container-9660119a3c-1232af2f:~/autodl-tmp/Test_Lee/LLaMA-Factory-main# llamafactory-cli train \
+>     --stage sft \
+>     --do_train True \
+>     --model_name_or_path /root/autodl-tmp/Test_Lee/LLaMA-Factory-main/qwen2-1.5b-instruct \
+>     --preprocessing_num_workers 16 \
+>     --finetuning_type lora \
+>     --template qwen \
+>     --flash_attn auto \
+>     --dataset_dir data \
+>     --dataset identity \
+>     --cutoff_len 1024 \
+>     --learning_rate 2e-05 \
+>     --num_train_epochs 9.0 \
+>     --max_samples 100000 \
+>     --per_device_train_batch_size 2 \
+>     --gradient_accumulation_steps 8 \
+>     --lr_scheduler_type cosine \
+>     --max_grad_norm 1.0 \
+>     --logging_steps 5 \
+>     --save_steps 100 \
+>     --warmup_steps 0 \
+>     --optim adamw_torch \
+>     --packing False \
+>     --report_to none \
+>     --output_dir saves/Qwen2-1.5B-Instruct/lora/train_2024-09-29-19-27-38 \
+>     --plot_loss True \
+>     --ddp_timeout 180000000 \
+>     --include_num_input_tokens_seen True \
+>     --lora_rank 8 \
+>     --lora_alpha 16 \
+>     --lora_dropout 0 \
+>     --lora_target all
+[2024-09-29 19:31:18,552] [INFO] [real_accelerator.py:203:get_accelerator] Setting ds_accelerator to cuda (auto detect)
+09/29/2024 19:31:25 - INFO - llamafactory.cli - Initializing distributed tasks at: 127.0.0.1:29212
+[2024-09-29 19:31:29,171] [INFO] [real_accelerator.py:203:get_accelerator] Setting ds_accelerator to cuda (auto detect)
+[2024-09-29 19:31:29,183] [INFO] [real_accelerator.py:203:get_accelerator] Setting ds_accelerator to cuda (auto detect)
+09/29/2024 19:31:33 - WARNING - llamafactory.hparams.parser - We recommend enable mixed precision training.
+09/29/2024 19:31:33 - WARNING - llamafactory.hparams.parser - `ddp_find_unused_parameters` needs to be set as False for LoRA in DDP training.
+09/29/2024 19:31:33 - INFO - llamafactory.hparams.parser - Process rank: 1, device: cuda:1, n_gpu: 1, distributed training: True, compute dtype: None
+09/29/2024 19:31:33 - WARNING - llamafactory.hparams.parser - We recommend enable mixed precision training.
+09/29/2024 19:31:33 - WARNING - llamafactory.hparams.parser - `ddp_find_unused_parameters` needs to be set as False for LoRA in DDP training.
+09/29/2024 19:31:33 - INFO - llamafactory.hparams.parser - Process rank: 0, device: cuda:0, n_gpu: 1, distributed training: True, compute dtype: None
+[INFO|configuration_utils.py:670] 2024-09-29 19:31:33,858 >> loading configuration file /root/autodl-tmp/Test_Lee/LLaMA-Factory-main/qwen2-1.5b-instruct/config.json
+[INFO|configuration_utils.py:739] 2024-09-29 19:31:33,860 >> Model config Qwen2Config {
+  "_name_or_path": "/root/autodl-tmp/Test_Lee/LLaMA-Factory-main/qwen2-1.5b-instruct",
+  "architectures": [
+    "Qwen2ForCausalLM"
+  ],
+  "attention_dropout": 0.0,
+  "bos_token_id": 151643,
+  "eos_token_id": 151645,
+  "hidden_act": "silu",
+  "hidden_size": 1536,
+  "initializer_range": 0.02,
+  "intermediate_size": 8960,
+  "max_position_embeddings": 32768,
+  "max_window_layers": 28,
+  "model_type": "qwen2",
+  "num_attention_heads": 12,
+  "num_hidden_layers": 28,
+  "num_key_value_heads": 2,
+  "rms_norm_eps": 1e-06,
+  "rope_scaling": null,
+  "rope_theta": 1000000.0,
+  "sliding_window": null,
+  "tie_word_embeddings": true,
+  "torch_dtype": "bfloat16",
+  "transformers_version": "4.45.0",
+  "use_cache": true,
+  "use_sliding_window": false,
+  "vocab_size": 151936
+}
+
+[INFO|tokenization_utils_base.py:2212] 2024-09-29 19:31:33,862 >> loading file vocab.json
+[INFO|tokenization_utils_base.py:2212] 2024-09-29 19:31:33,862 >> loading file merges.txt
+[INFO|tokenization_utils_base.py:2212] 2024-09-29 19:31:33,862 >> loading file tokenizer.json
+[INFO|tokenization_utils_base.py:2212] 2024-09-29 19:31:33,862 >> loading file added_tokens.json
+[INFO|tokenization_utils_base.py:2212] 2024-09-29 19:31:33,862 >> loading file special_tokens_map.json
+[INFO|tokenization_utils_base.py:2212] 2024-09-29 19:31:33,862 >> loading file tokenizer_config.json
+[INFO|tokenization_utils_base.py:2478] 2024-09-29 19:31:34,162 >> Special tokens have been added in the vocabulary, make sure the associated word embeddings are fine-tuned or trained.
+[INFO|configuration_utils.py:670] 2024-09-29 19:31:34,163 >> loading configuration file /root/autodl-tmp/Test_Lee/LLaMA-Factory-main/qwen2-1.5b-instruct/config.json
+[INFO|configuration_utils.py:739] 2024-09-29 19:31:34,164 >> Model config Qwen2Config {
+  "_name_or_path": "/root/autodl-tmp/Test_Lee/LLaMA-Factory-main/qwen2-1.5b-instruct",
+  "architectures": [
+    "Qwen2ForCausalLM"
+  ],
+  "attention_dropout": 0.0,
+  "bos_token_id": 151643,
+  "eos_token_id": 151645,
+  "hidden_act": "silu",
+  "hidden_size": 1536,
+  "initializer_range": 0.02,
+  "intermediate_size": 8960,
+  "max_position_embeddings": 32768,
+  "max_window_layers": 28,
+  "model_type": "qwen2",
+  "num_attention_heads": 12,
+  "num_hidden_layers": 28,
+  "num_key_value_heads": 2,
+  "rms_norm_eps": 1e-06,
+  "rope_scaling": null,
+  "rope_theta": 1000000.0,
+  "sliding_window": null,
+  "tie_word_embeddings": true,
+  "torch_dtype": "bfloat16",
+  "transformers_version": "4.45.0",
+  "use_cache": true,
+  "use_sliding_window": false,
+  "vocab_size": 151936
+}
+
+[INFO|tokenization_utils_base.py:2212] 2024-09-29 19:31:34,165 >> loading file vocab.json
+[INFO|tokenization_utils_base.py:2212] 2024-09-29 19:31:34,165 >> loading file merges.txt
+[INFO|tokenization_utils_base.py:2212] 2024-09-29 19:31:34,165 >> loading file tokenizer.json
+[INFO|tokenization_utils_base.py:2212] 2024-09-29 19:31:34,165 >> loading file added_tokens.json
+[INFO|tokenization_utils_base.py:2212] 2024-09-29 19:31:34,165 >> loading file special_tokens_map.json
+[INFO|tokenization_utils_base.py:2212] 2024-09-29 19:31:34,165 >> loading file tokenizer_config.json
+[INFO|tokenization_utils_base.py:2478] 2024-09-29 19:31:34,450 >> Special tokens have been added in the vocabulary, make sure the associated word embeddings are fine-tuned or trained.
+09/29/2024 19:31:34 - INFO - llamafactory.data.template - Replace eos token: <|im_end|>
+09/29/2024 19:31:34 - INFO - llamafactory.data.template - Replace eos token: <|im_end|>
+09/29/2024 19:31:34 - INFO - llamafactory.data.loader - Loading dataset identity.json...
+09/29/2024 19:31:36 - INFO - llamafactory.data.loader - Loading dataset identity.json...
+training example:
+input_ids:
+[151644, 8948, 198, 2610, 525, 264, 10950, 17847, 13, 151645, 198, 151644, 872, 198, 6023, 151645, 198, 151644, 77091, 198, 9707, 0, 358, 1079, 2362, 1515, 360, 53988, 1139, 32066, 11, 458, 15235, 17847, 7881, 553, 2362, 36164, 53988, 13, 2585, 646, 358, 7789, 498, 3351, 30, 151645]
+inputs:
+<|im_start|>system
+You are a helpful assistant.<|im_end|>
+<|im_start|>user
+hi<|im_end|>
+<|im_start|>assistant
+Hello! I am ImmanulLee_Teat, an AI assistant developed by ImmanuelLee. How can I assist you today?<|im_end|>
+label_ids:
+[-100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, 9707, 0, 358, 1079, 2362, 1515, 360, 53988, 1139, 32066, 11, 458, 15235, 17847, 7881, 553, 2362, 36164, 53988, 13, 2585, 646, 358, 7789, 498, 3351, 30, 151645]
+labels:
+Hello! I am ImmanulLee_Teat, an AI assistant developed by ImmanuelLee. How can I assist you today?<|im_end|>
+[INFO|configuration_utils.py:670] 2024-09-29 19:31:36,870 >> loading configuration file /root/autodl-tmp/Test_Lee/LLaMA-Factory-main/qwen2-1.5b-instruct/config.json
+[INFO|configuration_utils.py:739] 2024-09-29 19:31:36,871 >> Model config Qwen2Config {
+  "_name_or_path": "/root/autodl-tmp/Test_Lee/LLaMA-Factory-main/qwen2-1.5b-instruct",
+  "architectures": [
+    "Qwen2ForCausalLM"
+  ],
+  "attention_dropout": 0.0,
+  "bos_token_id": 151643,
+  "eos_token_id": 151645,
+  "hidden_act": "silu",
+  "hidden_size": 1536,
+  "initializer_range": 0.02,
+  "intermediate_size": 8960,
+  "max_position_embeddings": 32768,
+  "max_window_layers": 28,
+  "model_type": "qwen2",
+  "num_attention_heads": 12,
+  "num_hidden_layers": 28,
+  "num_key_value_heads": 2,
+  "rms_norm_eps": 1e-06,
+  "rope_scaling": null,
+  "rope_theta": 1000000.0,
+  "sliding_window": null,
+  "tie_word_embeddings": true,
+  "torch_dtype": "bfloat16",
+  "transformers_version": "4.45.0",
+  "use_cache": true,
+  "use_sliding_window": false,
+  "vocab_size": 151936
+}
+
+[INFO|modeling_utils.py:3723] 2024-09-29 19:31:36,902 >> loading weights file /root/autodl-tmp/Test_Lee/LLaMA-Factory-main/qwen2-1.5b-instruct/model.safetensors
+[INFO|modeling_utils.py:1622] 2024-09-29 19:31:36,911 >> Instantiating Qwen2ForCausalLM model under default dtype torch.bfloat16.
+[INFO|configuration_utils.py:1099] 2024-09-29 19:31:36,913 >> Generate config GenerationConfig {
+  "bos_token_id": 151643,
+  "eos_token_id": 151645
+}
+
+[INFO|modeling_utils.py:4568] 2024-09-29 19:31:37,953 >> All model checkpoint weights were used when initializing Qwen2ForCausalLM.
+
+[INFO|modeling_utils.py:4576] 2024-09-29 19:31:37,954 >> All the weights of Qwen2ForCausalLM were initialized from the model checkpoint at /root/autodl-tmp/Test_Lee/LLaMA-Factory-main/qwen2-1.5b-instruct.
+If your task is similar to the task the model of the checkpoint was trained on, you can already use Qwen2ForCausalLM for predictions without further training.
+[INFO|configuration_utils.py:1052] 2024-09-29 19:31:37,957 >> loading configuration file /root/autodl-tmp/Test_Lee/LLaMA-Factory-main/qwen2-1.5b-instruct/generation_config.json
+[INFO|configuration_utils.py:1099] 2024-09-29 19:31:37,957 >> Generate config GenerationConfig {
+  "bos_token_id": 151643,
+  "do_sample": true,
+  "eos_token_id": [
+    151645,
+    151643
+  ],
+  "pad_token_id": 151643,
+  "repetition_penalty": 1.1,
+  "temperature": 0.7,
+  "top_k": 20,
+  "top_p": 0.8
+}
+
+09/29/2024 19:31:37 - INFO - llamafactory.model.model_utils.checkpointing - Gradient checkpointing enabled.
+09/29/2024 19:31:37 - INFO - llamafactory.model.model_utils.attention - Using vanilla attention implementation.
+09/29/2024 19:31:37 - INFO - llamafactory.model.adapter - Upcasting trainable params to float32.
+09/29/2024 19:31:37 - INFO - llamafactory.model.adapter - Fine-tuning method: LoRA
+09/29/2024 19:31:37 - INFO - llamafactory.model.model_utils.misc - Found linear modules: k_proj,gate_proj,down_proj,o_proj,up_proj,v_proj,q_proj
+09/29/2024 19:31:38 - INFO - llamafactory.model.model_utils.checkpointing - Gradient checkpointing enabled.
+09/29/2024 19:31:38 - INFO - llamafactory.model.model_utils.attention - Using vanilla attention implementation.
+09/29/2024 19:31:38 - INFO - llamafactory.model.adapter - Upcasting trainable params to float32.
+09/29/2024 19:31:38 - INFO - llamafactory.model.adapter - Fine-tuning method: LoRA
+09/29/2024 19:31:38 - INFO - llamafactory.model.model_utils.misc - Found linear modules: v_proj,up_proj,q_proj,gate_proj,o_proj,down_proj,k_proj
+09/29/2024 19:31:38 - INFO - llamafactory.model.loader - trainable params: 9,232,384 || all params: 1,552,946,688 || trainable%: 0.5945
+Detected kernel version 5.4.0, which is below the recommended minimum of 5.5.0; this can cause the process to hang. It is recommended to upgrade the kernel to the minimum version or higher.
+09/29/2024 19:31:38 - INFO - llamafactory.model.loader - trainable params: 9,232,384 || all params: 1,552,946,688 || trainable%: 0.5945
+[INFO|trainer.py:2243] 2024-09-29 19:31:38,786 >> ***** Running training *****
+[INFO|trainer.py:2244] 2024-09-29 19:31:38,786 >>   Num examples = 91
+[INFO|trainer.py:2245] 2024-09-29 19:31:38,786 >>   Num Epochs = 9
+[INFO|trainer.py:2246] 2024-09-29 19:31:38,786 >>   Instantaneous batch size per device = 2
+[INFO|trainer.py:2249] 2024-09-29 19:31:38,786 >>   Total train batch size (w. parallel, distributed & accumulation) = 32
+[INFO|trainer.py:2250] 2024-09-29 19:31:38,786 >>   Gradient Accumulation steps = 8
+[INFO|trainer.py:2251] 2024-09-29 19:31:38,786 >>   Total optimization steps = 18
+[INFO|trainer.py:2252] 2024-09-29 19:31:38,791 >>   Number of trainable parameters = 9,232,384
+  0%|                                                                                                                                                                   | 0/18 [00:00<?, ?it/s]Traceback (most recent call last):
+  File "/root/autodl-tmp/Test_Lee/LLaMA-Factory-main/src/llamafactory/launcher.py", line 23, in <module>
+    launch()
+  File "/root/autodl-tmp/Test_Lee/LLaMA-Factory-main/src/llamafactory/launcher.py", line 19, in launch
+    run_exp()
+  File "/root/autodl-tmp/Test_Lee/LLaMA-Factory-main/src/llamafactory/train/tuner.py", line 50, in run_exp
+    run_sft(model_args, data_args, training_args, finetuning_args, generating_args, callbacks)
+  File "/root/autodl-tmp/Test_Lee/LLaMA-Factory-main/src/llamafactory/train/sft/workflow.py", line 96, in run_sft
+    train_result = trainer.train(resume_from_checkpoint=training_args.resume_from_checkpoint)
+  File "/root/miniconda3/lib/python3.8/site-packages/transformers/trainer.py", line 2052, in train
+Traceback (most recent call last):
+  File "/root/autodl-tmp/Test_Lee/LLaMA-Factory-main/src/llamafactory/launcher.py", line 23, in <module>
+    return inner_training_loop(
+  File "/root/miniconda3/lib/python3.8/site-packages/transformers/trainer.py", line 2388, in _inner_training_loop
+    launch()
+  File "/root/autodl-tmp/Test_Lee/LLaMA-Factory-main/src/llamafactory/launcher.py", line 19, in launch
+    run_exp()
+  File "/root/autodl-tmp/Test_Lee/LLaMA-Factory-main/src/llamafactory/train/tuner.py", line 50, in run_exp
+    run_sft(model_args, data_args, training_args, finetuning_args, generating_args, callbacks)
+  File "/root/autodl-tmp/Test_Lee/LLaMA-Factory-main/src/llamafactory/train/sft/workflow.py", line 96, in run_sft
+    train_result = trainer.train(resume_from_checkpoint=training_args.resume_from_checkpoint)
+  File "/root/miniconda3/lib/python3.8/site-packages/transformers/trainer.py", line 2052, in train
+    tr_loss_step = self.training_step(model, inputs)
+  File "/root/miniconda3/lib/python3.8/site-packages/transformers/trainer.py", line 3485, in training_step
+    return inner_training_loop(
+  File "/root/miniconda3/lib/python3.8/site-packages/transformers/trainer.py", line 2388, in _inner_training_loop
+    loss = self.compute_loss(model, inputs)
+  File "/root/miniconda3/lib/python3.8/site-packages/transformers/trainer.py", line 3532, in compute_loss
+    tr_loss_step = self.training_step(model, inputs)
+  File "/root/miniconda3/lib/python3.8/site-packages/transformers/trainer.py", line 3485, in training_step
+    outputs = model(**inputs)
+  File "/root/miniconda3/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1194, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/root/miniconda3/lib/python3.8/site-packages/torch/nn/parallel/distributed.py", line 1040, in forward
+    output = self._run_ddp_forward(*inputs, **kwargs)
+  File "/root/miniconda3/lib/python3.8/site-packages/torch/nn/parallel/distributed.py", line 1000, in _run_ddp_forward
+    loss = self.compute_loss(model, inputs)
+  File "/root/miniconda3/lib/python3.8/site-packages/transformers/trainer.py", line 3532, in compute_loss
+    return module_to_run(*inputs[0], **kwargs[0])
+  File "/root/miniconda3/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1194, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/root/miniconda3/lib/python3.8/site-packages/peft/peft_model.py", line 1577, in forward
+    return self.base_model(
+  File "/root/miniconda3/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1194, in _call_impl
+    outputs = model(**inputs)
+  File "/root/miniconda3/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1194, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/root/miniconda3/lib/python3.8/site-packages/peft/tuners/tuners_utils.py", line 188, in forward
+    return self.model.forward(*args, **kwargs)
+  File "/root/miniconda3/lib/python3.8/site-packages/transformers/models/qwen2/modeling_qwen2.py", line 1167, in forward
+    return forward_call(*input, **kwargs)
+  File "/root/miniconda3/lib/python3.8/site-packages/torch/nn/parallel/distributed.py", line 1040, in forward
+    outputs = self.model(
+  File "/root/miniconda3/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1194, in _call_impl
+    output = self._run_ddp_forward(*inputs, **kwargs)
+  File "/root/miniconda3/lib/python3.8/site-packages/torch/nn/parallel/distributed.py", line 1000, in _run_ddp_forward
+    return forward_call(*input, **kwargs)
+  File "/root/miniconda3/lib/python3.8/site-packages/transformers/models/qwen2/modeling_qwen2.py", line 945, in forward
+    return module_to_run(*inputs[0], **kwargs[0])
+    causal_mask = self._update_causal_mask(  File "/root/miniconda3/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1194, in _call_impl
+
+  File "/root/miniconda3/lib/python3.8/site-packages/transformers/models/qwen2/modeling_qwen2.py", line 1057, in _update_causal_mask
+    causal_mask = _prepare_4d_causal_attention_mask_with_cache_position(
+  File "/root/miniconda3/lib/python3.8/site-packages/transformers/models/qwen2/modeling_qwen2.py", line 104, in _prepare_4d_causal_attention_mask_with_cache_position
+    return forward_call(*input, **kwargs)
+  File "/root/miniconda3/lib/python3.8/site-packages/peft/peft_model.py", line 1577, in forward
+    causal_mask = torch.triu(causal_mask, diagonal=1)
+RuntimeError: "triu_tril_cuda_template" not implemented for 'BFloat16'
+    return self.base_model(
+  File "/root/miniconda3/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1194, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/root/miniconda3/lib/python3.8/site-packages/peft/tuners/tuners_utils.py", line 188, in forward
+    return self.model.forward(*args, **kwargs)
+  File "/root/miniconda3/lib/python3.8/site-packages/transformers/models/qwen2/modeling_qwen2.py", line 1167, in forward
+    outputs = self.model(
+  File "/root/miniconda3/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1194, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/root/miniconda3/lib/python3.8/site-packages/transformers/models/qwen2/modeling_qwen2.py", line 945, in forward
+    causal_mask = self._update_causal_mask(
+  File "/root/miniconda3/lib/python3.8/site-packages/transformers/models/qwen2/modeling_qwen2.py", line 1057, in _update_causal_mask
+    causal_mask = _prepare_4d_causal_attention_mask_with_cache_position(
+  File "/root/miniconda3/lib/python3.8/site-packages/transformers/models/qwen2/modeling_qwen2.py", line 104, in _prepare_4d_causal_attention_mask_with_cache_position
+    causal_mask = torch.triu(causal_mask, diagonal=1)
+RuntimeError: "triu_tril_cuda_template" not implemented for 'BFloat16'
+  0%|                                                                                                                                                                   | 0/18 [00:00<?, ?it/s]
+ERROR:torch.distributed.elastic.multiprocessing.api:failed (exitcode: 1) local_rank: 0 (pid: 4149) of binary: /root/miniconda3/bin/python
+Traceback (most recent call last):
+  File "/root/miniconda3/bin/torchrun", line 8, in <module>
+    sys.exit(main())
+  File "/root/miniconda3/lib/python3.8/site-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 346, in wrapper
+    return f(*args, **kwargs)
+  File "/root/miniconda3/lib/python3.8/site-packages/torch/distributed/run.py", line 762, in main
+    run(args)
+  File "/root/miniconda3/lib/python3.8/site-packages/torch/distributed/run.py", line 753, in run
+    elastic_launch(
+  File "/root/miniconda3/lib/python3.8/site-packages/torch/distributed/launcher/api.py", line 132, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+  File "/root/miniconda3/lib/python3.8/site-packages/torch/distributed/launcher/api.py", line 246, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+/root/autodl-tmp/Test_Lee/LLaMA-Factory-main/src/llamafactory/launcher.py FAILED
+------------------------------------------------------------
+Failures:
+[1]:
+  time      : 2024-09-29_19:31:46
+  host      : autodl-container-9660119a3c-1232af2f
+  rank      : 1 (local_rank: 1)
+  exitcode  : 1 (pid: 4150)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2024-09-29_19:31:46
+  host      : autodl-container-9660119a3c-1232af2f
+  rank      : 0 (local_rank: 0)
+  exitcode  : 1 (pid: 4149)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================
+
+
+
+6.1、某个基于LLamaFactory的微调代码
+llamafactory-cli train     --stage sft     --do_train True     --model_name_or_path /root/autodl-tmp/Test_Lee/LLaMA-Factory-main/qwen2-1.5b-instruct     --preprocessing_num_workers 16     --finetuning_type lora     --template qwen     --flash_attn auto     --dataset_dir /root/autodl-tmp/Test_Lee/LLaMA-Factory-main/data     --dataset identity     --cutoff_len 1024     --learning_rate 5e-05     --num_train_epochs 3.0     --max_samples 100000     --per_device_train_batch_size 2     --gradient_accumulation_steps 8     --lr_scheduler_type cosine     --max_grad_norm 1.0     --logging_steps 5     --save_steps 100     --warmup_steps 0     --optim adamw_torch     --packing False     --report_to none     --output_dir saves/Qwen2-1.5B-Instruct/lora/train_2024-09-28-22-02-58     --fp16 True     --plot_loss True     --ddp_timeout 180000000     --include_num_input_tokens_seen True     --lora_rank 8     --lora_alpha 16     --lora_dropout 0     --lora_target all
+
+
+(base) root@autodl-container-9660119a3c-1232af2f:~/autodl-tmp/Test_Lee/LLaMA-Factory-main# llamafactory-cli train     --stage sft     --do_train True     --model_name_or_path /root/autodl-tmp/Test_Lee/LLaMA-Factory-main/qwen2-1.5b-instruct     --preprocessing_num_workers 16     --finetuning_type lora     --template qwen     --flash_attn auto     --dataset_dir /root/autodl-tmp/Test_Lee/LLaMA-Factory-main/data     --dataset identity     --cutoff_len 1024     --learning_rate 5e-05     --num_train_epochs 3.0     --max_samples 100000     --per_device_train_batch_size 2     --gradient_accumulation_steps 8     --lr_scheduler_type cosine     --max_grad_norm 1.0     --logging_steps 5     --save_steps 100     --warmup_steps 0     --optim adamw_torch     --packing False     --report_to none     --output_dir saves/Qwen2-1.5B-Instruct/lora/train_2024-09-28-22-02-58     --fp16 True     --plot_loss True     --ddp_timeout 180000000     --include_num_input_tokens_seen True     --lora_rank 8     --lora_alpha 16     --lora_dropout 0     --lora_target all
+[2024-09-29 19:34:46,203] [INFO] [real_accelerator.py:203:get_accelerator] Setting ds_accelerator to cuda (auto detect)
+09/29/2024 19:34:52 - INFO - llamafactory.cli - Initializing distributed tasks at: 127.0.0.1:27888
+[2024-09-29 19:34:56,779] [INFO] [real_accelerator.py:203:get_accelerator] Setting ds_accelerator to cuda (auto detect)
+[2024-09-29 19:34:56,806] [INFO] [real_accelerator.py:203:get_accelerator] Setting ds_accelerator to cuda (auto detect)
+09/29/2024 19:35:01 - WARNING - llamafactory.hparams.parser - `ddp_find_unused_parameters` needs to be set as False for LoRA in DDP training.
+09/29/2024 19:35:01 - INFO - llamafactory.hparams.parser - Resuming training from saves/Qwen2-1.5B-Instruct/lora/train_2024-09-28-22-02-58/checkpoint-6.
+09/29/2024 19:35:01 - INFO - llamafactory.hparams.parser - Change `output_dir` or use `overwrite_output_dir` to avoid.
+09/29/2024 19:35:01 - INFO - llamafactory.hparams.parser - Process rank: 1, device: cuda:1, n_gpu: 1, distributed training: True, compute dtype: torch.float16
+09/29/2024 19:35:01 - WARNING - llamafactory.hparams.parser - `ddp_find_unused_parameters` needs to be set as False for LoRA in DDP training.
+09/29/2024 19:35:01 - INFO - llamafactory.hparams.parser - Resuming training from saves/Qwen2-1.5B-Instruct/lora/train_2024-09-28-22-02-58/checkpoint-6.
+09/29/2024 19:35:01 - INFO - llamafactory.hparams.parser - Change `output_dir` or use `overwrite_output_dir` to avoid.
+09/29/2024 19:35:01 - INFO - llamafactory.hparams.parser - Process rank: 0, device: cuda:0, n_gpu: 1, distributed training: True, compute dtype: torch.float16
+[INFO|configuration_utils.py:670] 2024-09-29 19:35:01,416 >> loading configuration file /root/autodl-tmp/Test_Lee/LLaMA-Factory-main/qwen2-1.5b-instruct/config.json
+[INFO|configuration_utils.py:739] 2024-09-29 19:35:01,418 >> Model config Qwen2Config {
+  "_name_or_path": "/root/autodl-tmp/Test_Lee/LLaMA-Factory-main/qwen2-1.5b-instruct",
+  "architectures": [
+    "Qwen2ForCausalLM"
+  ],
+  "attention_dropout": 0.0,
+  "bos_token_id": 151643,
+  "eos_token_id": 151645,
+  "hidden_act": "silu",
+  "hidden_size": 1536,
+  "initializer_range": 0.02,
+  "intermediate_size": 8960,
+  "max_position_embeddings": 32768,
+  "max_window_layers": 28,
+  "model_type": "qwen2",
+  "num_attention_heads": 12,
+  "num_hidden_layers": 28,
+  "num_key_value_heads": 2,
+  "rms_norm_eps": 1e-06,
+  "rope_scaling": null,
+  "rope_theta": 1000000.0,
+  "sliding_window": null,
+  "tie_word_embeddings": true,
+  "torch_dtype": "bfloat16",
+  "transformers_version": "4.45.0",
+  "use_cache": true,
+  "use_sliding_window": false,
+  "vocab_size": 151936
+}
+
+[INFO|tokenization_utils_base.py:2212] 2024-09-29 19:35:01,420 >> loading file vocab.json
+[INFO|tokenization_utils_base.py:2212] 2024-09-29 19:35:01,420 >> loading file merges.txt
+[INFO|tokenization_utils_base.py:2212] 2024-09-29 19:35:01,420 >> loading file tokenizer.json
+[INFO|tokenization_utils_base.py:2212] 2024-09-29 19:35:01,420 >> loading file added_tokens.json
+[INFO|tokenization_utils_base.py:2212] 2024-09-29 19:35:01,420 >> loading file special_tokens_map.json
+[INFO|tokenization_utils_base.py:2212] 2024-09-29 19:35:01,420 >> loading file tokenizer_config.json
+[INFO|tokenization_utils_base.py:2478] 2024-09-29 19:35:01,717 >> Special tokens have been added in the vocabulary, make sure the associated word embeddings are fine-tuned or trained.
+[INFO|configuration_utils.py:670] 2024-09-29 19:35:01,718 >> loading configuration file /root/autodl-tmp/Test_Lee/LLaMA-Factory-main/qwen2-1.5b-instruct/config.json
+[INFO|configuration_utils.py:739] 2024-09-29 19:35:01,719 >> Model config Qwen2Config {
+  "_name_or_path": "/root/autodl-tmp/Test_Lee/LLaMA-Factory-main/qwen2-1.5b-instruct",
+  "architectures": [
+    "Qwen2ForCausalLM"
+  ],
+  "attention_dropout": 0.0,
+  "bos_token_id": 151643,
+  "eos_token_id": 151645,
+  "hidden_act": "silu",
+  "hidden_size": 1536,
+  "initializer_range": 0.02,
+  "intermediate_size": 8960,
+  "max_position_embeddings": 32768,
+  "max_window_layers": 28,
+  "model_type": "qwen2",
+  "num_attention_heads": 12,
+  "num_hidden_layers": 28,
+  "num_key_value_heads": 2,
+  "rms_norm_eps": 1e-06,
+  "rope_scaling": null,
+  "rope_theta": 1000000.0,
+  "sliding_window": null,
+  "tie_word_embeddings": true,
+  "torch_dtype": "bfloat16",
+  "transformers_version": "4.45.0",
+  "use_cache": true,
+  "use_sliding_window": false,
+  "vocab_size": 151936
+}
+
+[INFO|tokenization_utils_base.py:2212] 2024-09-29 19:35:01,720 >> loading file vocab.json
+[INFO|tokenization_utils_base.py:2212] 2024-09-29 19:35:01,720 >> loading file merges.txt
+[INFO|tokenization_utils_base.py:2212] 2024-09-29 19:35:01,720 >> loading file tokenizer.json
+[INFO|tokenization_utils_base.py:2212] 2024-09-29 19:35:01,720 >> loading file added_tokens.json
+[INFO|tokenization_utils_base.py:2212] 2024-09-29 19:35:01,720 >> loading file special_tokens_map.json
+[INFO|tokenization_utils_base.py:2212] 2024-09-29 19:35:01,720 >> loading file tokenizer_config.json
+[INFO|tokenization_utils_base.py:2478] 2024-09-29 19:35:02,008 >> Special tokens have been added in the vocabulary, make sure the associated word embeddings are fine-tuned or trained.
+09/29/2024 19:35:02 - INFO - llamafactory.data.template - Replace eos token: <|im_end|>
+09/29/2024 19:35:02 - INFO - llamafactory.data.loader - Loading dataset identity.json...
+09/29/2024 19:35:02 - INFO - llamafactory.data.template - Replace eos token: <|im_end|>
+09/29/2024 19:35:03 - INFO - llamafactory.data.loader - Loading dataset identity.json...
+training example:
+input_ids:
+[151644, 8948, 198, 2610, 525, 264, 10950, 17847, 13, 151645, 198, 151644, 872, 198, 6023, 151645, 198, 151644, 77091, 198, 9707, 0, 358, 1079, 2362, 1515, 360, 53988, 1139, 32066, 11, 458, 15235, 17847, 7881, 553, 2362, 36164, 53988, 13, 2585, 646, 358, 7789, 498, 3351, 30, 151645]
+inputs:
+<|im_start|>system
+You are a helpful assistant.<|im_end|>
+<|im_start|>user
+hi<|im_end|>
+<|im_start|>assistant
+Hello! I am ImmanulLee_Teat, an AI assistant developed by ImmanuelLee. How can I assist you today?<|im_end|>
+label_ids:
+[-100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, -100, 9707, 0, 358, 1079, 2362, 1515, 360, 53988, 1139, 32066, 11, 458, 15235, 17847, 7881, 553, 2362, 36164, 53988, 13, 2585, 646, 358, 7789, 498, 3351, 30, 151645]
+labels:
+Hello! I am ImmanulLee_Teat, an AI assistant developed by ImmanuelLee. How can I assist you today?<|im_end|>
+[INFO|configuration_utils.py:670] 2024-09-29 19:35:04,454 >> loading configuration file /root/autodl-tmp/Test_Lee/LLaMA-Factory-main/qwen2-1.5b-instruct/config.json
+[INFO|configuration_utils.py:739] 2024-09-29 19:35:04,455 >> Model config Qwen2Config {
+  "_name_or_path": "/root/autodl-tmp/Test_Lee/LLaMA-Factory-main/qwen2-1.5b-instruct",
+  "architectures": [
+    "Qwen2ForCausalLM"
+  ],
+  "attention_dropout": 0.0,
+  "bos_token_id": 151643,
+  "eos_token_id": 151645,
+  "hidden_act": "silu",
+  "hidden_size": 1536,
+  "initializer_range": 0.02,
+  "intermediate_size": 8960,
+  "max_position_embeddings": 32768,
+  "max_window_layers": 28,
+  "model_type": "qwen2",
+  "num_attention_heads": 12,
+  "num_hidden_layers": 28,
+  "num_key_value_heads": 2,
+  "rms_norm_eps": 1e-06,
+  "rope_scaling": null,
+  "rope_theta": 1000000.0,
+  "sliding_window": null,
+  "tie_word_embeddings": true,
+  "torch_dtype": "bfloat16",
+  "transformers_version": "4.45.0",
+  "use_cache": true,
+  "use_sliding_window": false,
+  "vocab_size": 151936
+}
+
+[INFO|modeling_utils.py:3723] 2024-09-29 19:35:04,486 >> loading weights file /root/autodl-tmp/Test_Lee/LLaMA-Factory-main/qwen2-1.5b-instruct/model.safetensors
+[INFO|modeling_utils.py:1622] 2024-09-29 19:35:04,495 >> Instantiating Qwen2ForCausalLM model under default dtype torch.float16.
+[INFO|configuration_utils.py:1099] 2024-09-29 19:35:04,497 >> Generate config GenerationConfig {
+  "bos_token_id": 151643,
+  "eos_token_id": 151645
+}
+
+[INFO|modeling_utils.py:4568] 2024-09-29 19:35:06,316 >> All model checkpoint weights were used when initializing Qwen2ForCausalLM.
+
+[INFO|modeling_utils.py:4576] 2024-09-29 19:35:06,316 >> All the weights of Qwen2ForCausalLM were initialized from the model checkpoint at /root/autodl-tmp/Test_Lee/LLaMA-Factory-main/qwen2-1.5b-instruct.
+If your task is similar to the task the model of the checkpoint was trained on, you can already use Qwen2ForCausalLM for predictions without further training.
+[INFO|configuration_utils.py:1052] 2024-09-29 19:35:06,319 >> loading configuration file /root/autodl-tmp/Test_Lee/LLaMA-Factory-main/qwen2-1.5b-instruct/generation_config.json
+[INFO|configuration_utils.py:1099] 2024-09-29 19:35:06,319 >> Generate config GenerationConfig {
+  "bos_token_id": 151643,
+  "do_sample": true,
+  "eos_token_id": [
+    151645,
+    151643
+  ],
+  "pad_token_id": 151643,
+  "repetition_penalty": 1.1,
+  "temperature": 0.7,
+  "top_k": 20,
+  "top_p": 0.8
+}
+
+09/29/2024 19:35:06 - INFO - llamafactory.model.model_utils.checkpointing - Gradient checkpointing enabled.
+09/29/2024 19:35:06 - INFO - llamafactory.model.model_utils.attention - Using vanilla attention implementation.
+09/29/2024 19:35:06 - INFO - llamafactory.model.adapter - Upcasting trainable params to float32.
+09/29/2024 19:35:06 - INFO - llamafactory.model.adapter - Fine-tuning method: LoRA
+09/29/2024 19:35:06 - INFO - llamafactory.model.model_utils.misc - Found linear modules: gate_proj,down_proj,v_proj,k_proj,o_proj,q_proj,up_proj
+09/29/2024 19:35:06 - INFO - llamafactory.model.model_utils.checkpointing - Gradient checkpointing enabled.
+09/29/2024 19:35:06 - INFO - llamafactory.model.model_utils.attention - Using vanilla attention implementation.
+09/29/2024 19:35:06 - INFO - llamafactory.model.adapter - Upcasting trainable params to float32.
+09/29/2024 19:35:06 - INFO - llamafactory.model.adapter - Fine-tuning method: LoRA
+09/29/2024 19:35:06 - INFO - llamafactory.model.model_utils.misc - Found linear modules: q_proj,v_proj,k_proj,up_proj,o_proj,gate_proj,down_proj
+09/29/2024 19:35:06 - INFO - llamafactory.model.loader - trainable params: 9,232,384 || all params: 1,552,946,688 || trainable%: 0.5945
+Detected kernel version 5.4.0, which is below the recommended minimum of 5.5.0; this can cause the process to hang. It is recommended to upgrade the kernel to the minimum version or higher.
+[INFO|trainer.py:667] 2024-09-29 19:35:06,696 >> Using auto half precision backend
+[INFO|trainer.py:2637] 2024-09-29 19:35:06,696 >> Loading model from saves/Qwen2-1.5B-Instruct/lora/train_2024-09-28-22-02-58/checkpoint-6.
+09/29/2024 19:35:06 - INFO - llamafactory.model.loader - trainable params: 9,232,384 || all params: 1,552,946,688 || trainable%: 0.5945
+[INFO|trainer.py:2243] 2024-09-29 19:35:09,166 >> ***** Running training *****
+[INFO|trainer.py:2244] 2024-09-29 19:35:09,166 >>   Num examples = 91
+[INFO|trainer.py:2245] 2024-09-29 19:35:09,166 >>   Num Epochs = 3
+[INFO|trainer.py:2246] 2024-09-29 19:35:09,166 >>   Instantaneous batch size per device = 2
+[INFO|trainer.py:2249] 2024-09-29 19:35:09,166 >>   Total train batch size (w. parallel, distributed & accumulation) = 32
+[INFO|trainer.py:2250] 2024-09-29 19:35:09,166 >>   Gradient Accumulation steps = 8
+[INFO|trainer.py:2251] 2024-09-29 19:35:09,166 >>   Total optimization steps = 6
+[INFO|trainer.py:2252] 2024-09-29 19:35:09,171 >>   Number of trainable parameters = 9,232,384
+[INFO|trainer.py:2274] 2024-09-29 19:35:09,171 >>   Continuing training from checkpoint, will skip to saved global_step
+[INFO|trainer.py:2275] 2024-09-29 19:35:09,171 >>   Continuing training from epoch 3
+[INFO|trainer.py:2276] 2024-09-29 19:35:09,171 >>   Continuing training from global step 6
+[INFO|trainer.py:2278] 2024-09-29 19:35:09,171 >>   Will skip the first 3 epochs then the first 0 batches in the first epoch.
+  0%|                                                                                                                                                                    | 0/6 [00:00<?, ?it/s][INFO|trainer.py:2505] 2024-09-29 19:35:11,676 >> 
+
+Training completed. Do not forget to share your model on huggingface.co/models =)
+
+
+{'train_runtime': 2.5052, 'train_samples_per_second': 108.974, 'train_steps_per_second': 2.395, 'train_loss': 0.0, 'epoch': 2.09, 'num_input_tokens_seen': 12288}                              
+  0%|                                                                                                                                                                    | 0/6 [00:00<?, ?it/s]
+[INFO|trainer.py:3705] 2024-09-29 19:35:11,678 >> Saving model checkpoint to saves/Qwen2-1.5B-Instruct/lora/train_2024-09-28-22-02-58
+[INFO|configuration_utils.py:670] 2024-09-29 19:35:11,690 >> loading configuration file /root/autodl-tmp/Test_Lee/LLaMA-Factory-main/qwen2-1.5b-instruct/config.json
+[INFO|configuration_utils.py:739] 2024-09-29 19:35:11,691 >> Model config Qwen2Config {
+  "architectures": [
+    "Qwen2ForCausalLM"
+  ],
+  "attention_dropout": 0.0,
+  "bos_token_id": 151643,
+  "eos_token_id": 151645,
+  "hidden_act": "silu",
+  "hidden_size": 1536,
+  "initializer_range": 0.02,
+  "intermediate_size": 8960,
+  "max_position_embeddings": 32768,
+  "max_window_layers": 28,
+  "model_type": "qwen2",
+  "num_attention_heads": 12,
+  "num_hidden_layers": 28,
+  "num_key_value_heads": 2,
+  "rms_norm_eps": 1e-06,
+  "rope_scaling": null,
+  "rope_theta": 1000000.0,
+  "sliding_window": null,
+  "tie_word_embeddings": true,
+  "torch_dtype": "bfloat16",
+  "transformers_version": "4.45.0",
+  "use_cache": true,
+  "use_sliding_window": false,
+  "vocab_size": 151936
+}
+
+[INFO|tokenization_utils_base.py:2649] 2024-09-29 19:35:11,773 >> tokenizer config file saved in saves/Qwen2-1.5B-Instruct/lora/train_2024-09-28-22-02-58/tokenizer_config.json
+[INFO|tokenization_utils_base.py:2658] 2024-09-29 19:35:11,773 >> Special tokens file saved in saves/Qwen2-1.5B-Instruct/lora/train_2024-09-28-22-02-58/special_tokens_map.json
+***** train metrics *****
+  epoch                    =      2.087
+  num_input_tokens_seen    =      12288
+  total_flos               =    90607GF
+  train_loss               =        0.0
+  train_runtime            = 0:00:02.50
+  train_samples_per_second =    108.974
+  train_steps_per_second   =      2.395
+Figure saved at: saves/Qwen2-1.5B-Instruct/lora/train_2024-09-28-22-02-58/training_loss.png
+09/29/2024 19:35:12 - WARNING - llamafactory.extras.ploting - No metric eval_loss to plot.
+09/29/2024 19:35:12 - WARNING - llamafactory.extras.ploting - No metric eval_accuracy to plot.
+[INFO|modelcard.py:449] 2024-09-29 19:35:12,103 >> Dropping the following result as it does not have all the necessary fields:
+{'task': {'name': 'Causal Language Modeling', 'type': 'text-generation'}}
+
+6.2、微调后的模型路径
+/root/autodl-tmp/Test_Lee/LLaMA-Factory-main/saves/Qwen2-1.5B-Instruct/lora/train_2024-09-28-22-02-58
+
+6.3、原模型路径
+/root/autodl-tmp/Test_Lee/LLaMA-Factory-main/qwen2-1.5b-instruct
+
+6.4、调用基本对话路径
+cd ~/autodl-tmp/Test_Lee/LLaMA-Factory-main/
+
+
+7、多卡下的模型部署
+CUDA_VISIBLE_DEVICES=0,1 llamafactory-cli webchat --model_name_or_path /root/autodl-tmp/Test_Lee/LLaMA-Factory-main/qwen2-1.5b-instruct --template qwen --infer_dtype float32
+
+
+8、数据集位置
+/root/autodl-tmp/Test_Lee/LLaMA-Factory-main/data
+
+
+
+
+test:
+Lee20240929的微调代码：
+llamafactory-cli train \
+    --stage sft \
+    --do_train True \
+    --model_name_or_path /root/autodl-tmp/Test_Lee/LLaMA-Factory-main/qwen2-1.5b-instruct \
+    --preprocessing_num_workers 16 \
+    --finetuning_type lora \
+    --template qwen \
+    --flash_attn auto \
+    --dataset_dir /root/autodl-tmp/Test_Lee/LLaMA-Factory-main/data \
+    --dataset identity \
+    --cutoff_len 1024 \
+    --learning_rate 0.002 \
+    --num_train_epochs 9.0 \
+    --max_samples 100000 \
+    --per_device_train_batch_size 2 \
+    --gradient_accumulation_steps 8 \
+    --lr_scheduler_type cosine \
+    --max_grad_norm 1.0 \
+    --logging_steps 5 \
+    --save_steps 100 \
+    --warmup_steps 0 \
+    --optim adamw_torch \
+    --packing False \
+    --report_to none \
+    --output_dir saves/Qwen2-1.5B-Instruct/lora/train_2024-09-29-20-35-33 \
+    --plot_loss True \
+    --ddp_timeout 180000000 \
+    --include_num_input_tokens_seen True \
+    --lora_rank 8 \
+    --lora_alpha 16 \
+    --lora_dropout 0 \
+    --lora_target all
+
+
+llamafactory-cli train \
+    --stage sft \
+    --do_train True \
+    --model_name_or_path /root/autodl-tmp/Test_Lee/LLaMA-Factory-main/qwen2-1.5b-instruct \
+    --preprocessing_num_workers 16 \
+    --finetuning_type lora \
+    --template qwen \
+    --flash_attn auto \
+    --dataset_dir /root/autodl-tmp/Test_Lee/LLaMA-Factory-main/data \
+    --dataset identity \
+    --cutoff_len 1024 \
+    --learning_rate 0.002 \
+    --num_train_epochs 9.0 \
+    --max_samples 100000 \
+    --per_device_train_batch_size 2 \
+    --gradient_accumulation_steps 8 \
+    --lr_scheduler_type cosine \
+    --max_grad_norm 1.0 \
+    --logging_steps 5 \
+    --save_steps 100 \
+    --warmup_steps 0 \
+    --optim adamw_torch \
+    --packing False \
+    --report_to none \
+    --output_dir saves/Qwen2-1.5B-Instruct/lora/train_2024-09-29-20-20-33 \
+    --bf16 True \
+    --plot_loss True \
+    --ddp_timeout 180000000 \
+    --include_num_input_tokens_seen True \
+    --lora_rank 8 \
+    --lora_alpha 16 \
+    --lora_dropout 0 \
+    --lora_target all
+
+
+llamafactory-cli train \
+    --stage sft \
+    --do_train True \
+    --model_name_or_path /root/autodl-tmp/Test_Lee/LLaMA-Factory-main/qwen2-1.5b-instruct \
+    --preprocessing_num_workers 16 \
+    --finetuning_type lora \
+    --template qwen \
+    --flash_attn fa2 \
+    --dataset_dir /root/autodl-tmp/Test_Lee/LLaMA-Factory-main/data \
+    --dataset identity \
+    --cutoff_len 1024 \
+    --learning_rate 0.002 \
+    --num_train_epochs 9.0 \
+    --max_samples 100000 \
+    --per_device_train_batch_size 2 \
+    --gradient_accumulation_steps 8 \
+    --lr_scheduler_type cosine \
+    --max_grad_norm 1.0 \
+    --logging_steps 5 \
+    --save_steps 100 \
+    --warmup_steps 0 \
+    --optim adamw_torch \
+    --packing False \
+    --report_to none \
+    --output_dir saves/Qwen2-1.5B-Instruct/lora/train_2024-09-29-20-35-33 \
+    --plot_loss True \
+    --ddp_timeout 180000000 \
+    --include_num_input_tokens_seen True \
+    --lora_rank 8 \
+    --lora_alpha 16 \
+    --lora_dropout 0 \
+    --lora_target all
+
+
+
+附录：
+查看支持的最高cuda版本：
+nvidia-smi
+
+nvcc -V
+
+cuda11.7是可以支持到最高：2.0的torch
+torch                     2.0.0+cu117              pypi_0    pypi
+
+
+modelPath=models/Qwen1.5-1.8B-Chat
+
+llamafactory-cli train \
+  --model_name_or_path /root/autodl-tmp/Test_Lee/LLaMA-Factory-main/qwen2-1.5b-instruct \
+  --stage sft \
+  --do_train \
+  --finetuning_type lora \
+  --template qwen \
+  --dataset identity \
+  --output_dir  /root/autodl-tmp/Test_Lee/LLaMA-Factory-main/data \
+  --learning_rate 0.0005 \
+  --num_train_epochs 8 \
+  --cutoff_len 4096 \
+  --logging_steps 1 \
+  --warmup_ratio 0.1 \
+  --weight_decay 0.1 \
+  --gradient_accumulation_steps 8 \
+  --save_total_limit 1 \
+  --save_steps 256 \
+  --seed 42 \
+  --data_seed 42 \
+  --lr_scheduler_type cosine \
+  --overwrite_cache \
+  --preprocessing_num_workers 16 \
+  --plot_loss \
+  --overwrite_output_dir \
+  --per_device_train_batch_size 1 \
+  --fp16
+
+
+
+llamafactory-cli train \
+    --stage sft \
+    --do_train True \
+    --model_name_or_path /root/autodl-tmp/Test_Lee/LLaMA-Factory-main/qwen2-1.5b-instruct \
+    --preprocessing_num_workers 16 \
+    --finetuning_type lora \
+    --template qwen \
+    --flash_attn fa2 \
+    --dataset_dir /root/autodl-tmp/Test_Lee/LLaMA-Factory-main/data \
+    --dataset identity \
+    --cutoff_len 1024 \
+    --learning_rate 0.002 \
+    --num_train_epochs 9.0 \
+    --max_samples 100000 \
+    --per_device_train_batch_size 2 \
+    --gradient_accumulation_steps 8 \
+    --lr_scheduler_type cosine \
+    --max_grad_norm 1.0 \
+    --logging_steps 5 \
+    --save_steps 100 \
+    --warmup_steps 0 \
+    --optim adamw_torch \
+    --packing False \
+    --report_to none \
+    --output_dir saves/Qwen2-1.5B-Instruct/lora/train_2024-09-29-20-35-33 \
+    --plot_loss True \
+    --ddp_timeout 180000000 \
+    --include_num_input_tokens_seen True \
+    --lora_rank 8 \
+    --lora_alpha 16 \
+    --lora_dropout 0 \
+    --lora_target all
+    --fp 16
+
+上述可行
+
+
+
+
+
+
+
+
+

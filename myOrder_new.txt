@@ -1,0 +1,37 @@
+torch                     2.3.0+cu121              pypi_0    pypi
+
+python                    3.12.3
+
+
+ssh -p 51824 root@connect.bjb1.seetacloud.com
+5S5gVmJCFCPV
+
+
+
+sudo apt-get update
+sudo apt-get install git-lfs
+	
+git lfs install
+
+git clone https://www.modelscope.cn/qwen/qwen2-1.5b-instruct.git
+
+
+
+pip install .
+CUDA_VISIBLE_DEVICES=0 llamafactory-cli webchat \
+    --model_name_or_path /root/autodl-tmp/Lee_LLamaFactory/LLaMA-Factory-main/LLaMA-Factory-main/qwen2-1.5b-instruct \
+    --template qwen
+
+cd data
+head identity.json 
+
+
+
+
+
+
+
+
+
+
+
